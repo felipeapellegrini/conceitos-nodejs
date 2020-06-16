@@ -52,6 +52,7 @@ app.put("/repositories/:id", (req, res) => {
 
   // creating the repo object 
   const repository = {
+    id,
     title,
     url,
     techs,
@@ -59,6 +60,8 @@ app.put("/repositories/:id", (req, res) => {
 
   // updating the repo's array with the changed one
   repositories[repositoryIndex] = repository;
+
+  return res.json(repository);
 
 });
 
