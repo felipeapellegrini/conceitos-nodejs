@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { uuid } = require("uuidv4");
+const { uuid, isUuid } = require("uuidv4");
 
 const app = express();
 
@@ -8,6 +8,18 @@ app.use(express.json());
 app.use(cors());
 
 const repositories = [];
+
+function validateRepoId(req, res, next) {
+  const { id } = req.params;
+
+  if (!isUuid(id)) {
+    return res.status(400).json({ error: 'Invalid repository ID.'});
+  }
+
+  return next();
+}
+
+app.use('repositories/:id', validateRepoId);
 
 app.get("/repositories", (req, res) => {
   return res.json(repositories);
@@ -40,7 +52,7 @@ app.put("/repositories/:id", (req, res) => {
   const { id } = req.params;
 
   // getting the repo's values to update
-  const { title, url, techs } = req.body;
+  const { title, url, techs, likes } = req.body;
 
   // getting the repo's index
   const repositoryIndex = repositories.findIndex(repository => repository.id === id);
@@ -56,6 +68,7 @@ app.put("/repositories/:id", (req, res) => {
     title,
     url,
     techs,
+    likes: repositories[repositoryIndex].likes, // this line blocks the put route from updating the likes's number
   };
 
   // updating the repo's array with the changed one
@@ -87,7 +100,23 @@ app.delete("/repositories/:id", (req, res) => {
 });
 
 app.post("/repositories/:id/like", (req, res) => {
-  // TODO
+    // getting the repo id and likes
+    const { id } = req.params;
+
+    // getting repo
+    const repository = repositories.find(repository => repository.id === id);
+
+  // checking if it's an existing repo
+  if (!repository) {
+    return res.status(400).send();
+  }
+
+  // give a like to the existing repo
+  repository.likes ++;
+
+  return res.json(repository);
+
+  
 });
 
 module.exports = app;
