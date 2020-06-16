@@ -52,7 +52,7 @@ app.put("/repositories/:id", (req, res) => {
   const { id } = req.params;
 
   // getting the repo's values to update
-  const { title, url, techs, likes } = req.body;
+  const { title, url, techs } = req.body;
 
   // getting the repo's index
   const repositoryIndex = repositories.findIndex(repository => repository.id === id);
